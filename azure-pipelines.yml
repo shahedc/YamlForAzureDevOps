@@ -43,6 +43,7 @@ steps:
     appType: 'webApp'
     package: $(Build.ArtifactStagingDirectory)/**/*.zip
 
+# Optional step if you want to deploy to some other system using a Release pipeline
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Build artifacts'
   inputs:
