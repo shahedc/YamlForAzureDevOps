@@ -11,7 +11,7 @@ pool:
 
 variables:
   BuildConfiguration: 'Release'
-  SolutionPath: 'YOUR_SOLUTION_PATH/YOUR_SOLUTION.sln'
+  SolutionPath: 'YOUR_SOLUTION_FOLDER/YOUR_SOLUTION.sln'
 
 steps:
 - task: DotNetCoreCLI@2
