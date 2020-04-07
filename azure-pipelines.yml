@@ -10,7 +10,8 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  buildConfiguration: 'Release'
+  BuildConfiguration: 'Release'
+  SolutionPath: 'YOUR_SOLUTION_PATH/YOUR_SOLUTION.sln'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -23,14 +24,14 @@ steps:
   displayName: 'Build web project'
   inputs:
     command: 'build'
-    projects: '<REPLACE_WITH_SOLUTION_NAME>.sln'
+    projects: $(SolutionPath)
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish and zip'
   inputs:
     command: publish
     publishWebProjects: False
-    projects: '<REPLACE_WITH_SOLUTION_NAME>.sln'
+    projects: $(SolutionPath)
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: True
 
