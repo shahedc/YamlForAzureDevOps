@@ -1,0 +1,68 @@
+# Example of a MultiStage Pipeline
+# to Build an ASP.NET Core app
+# and deploy it to an Azure App Service WebApp
+
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest' # Change to 'windows-latest' if your build require any Windows-specific component
+
+variables:
+  BuildConfiguration: 'Release'
+  SolutionPath: 'YOUR_SOLUTION_FOLDER/YOUR_SOLUTION.sln'
+  ArtifactName: 'MyWebApp'
+
+stages:
+- stage: CI
+  displayName: CI Stage
+  jobs:
+  - job: build
+    displayName: Build
+    steps:
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build web project'
+      inputs:
+        command: 'build'
+        projects: $(SolutionPath)
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish and zip'
+      inputs:
+        command: publish
+        publishWebProjects: False
+        projects: $(SolutionPath)
+        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        zipAfterPublish: True
+    
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Pipeline Artifact'
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: '$(ArtifactName)'
+        publishLocation: 'pipeline'
+
+- stage: CD
+  displayName: CD Stage
+  jobs:
+  - deployment: deploy
+    displayName: Deploy
+    environment: YOUR_ENVIRONMENT_NAME # Existing environment or it will create automatically a new one
+    strategy: 
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureRmWebAppDeployment@4
+            displayName: "Deploy to Azure WebApp"  
+            inputs:
+              ConnectionType: 'AzureRM'
+              azureSubscription: '<REPLACE_WITH_AZURE_SUBSCRIPTION_INFO>' #Format: 'SubscriptionName(SubscriptionGUI)', ie: 'My Azure Subscription(12345678-abcd-1234-abcd-a1b2c3d4e5f6)' 
+              appType: 'webApp'
+              WebAppName: '<REPLACE_WITH_EXISTING_APP_SERVICE_NAME>'
+              packageForLinux: '$(Pipeline.Workspace)/$(ArtifactName)/*.zip'
+              enableCustomDeployment: true
+              DeploymentType: 'webDeploy'
+
+
+
