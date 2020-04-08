@@ -14,11 +14,12 @@ variables:
   SolutionPath: 'YOUR_SOLUTION_FOLDER/YOUR_SOLUTION.sln'
 
 steps:
-- task: DotNetCoreCLI@2
-  displayName: 'Restore dependencies'
-  inputs:
-    command: restore
-    projects: '**/*.csproj'
+# Optional: 'dotnet restore' is not necessary because the 'dotnet build' command executes restore as well.
+#- task: DotNetCoreCLI@2
+#  displayName: 'Restore dependencies'
+#  inputs:
+#    command: restore
+#    projects: '**/*.csproj'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build web project'
